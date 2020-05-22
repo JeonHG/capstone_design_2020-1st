@@ -39,7 +39,7 @@ def get_torque(angular_velocity):
         value["arctan"] = math.degrees(math.atan2(value["wind_velocity"], value["blade_velocity"]))
         aoa = round(value["arctan"] - value["pitch_angle"], 2)
         value["angle_of_attack"] = aoa
-        re_n = round(value["relative_velocity"] * value["chord_length"] / 0.00001511, 2)
+        re_n = round(value["relative_velocity"] * value["chord_length"] / 0.00001511, 3)
         value["Reynolds_number"] = re_n
         xf = XFoil()
         if key < 13: 
@@ -47,7 +47,7 @@ def get_torque(angular_velocity):
         else:
             xf.airfoil = naca2412
         xf.Re = re_n
-        xf.max_iter = 400
+        xf.max_iter = 100
         value["Cl"], value["Cd"], value["Cm"], value["Cp"] = xf.a(aoa)
         force_reference = 0.5 * density * value["relative_velocity"]**2
         if math.isnan(value["Cl"]):
@@ -55,7 +55,8 @@ def get_torque(angular_velocity):
         else:
             lift = value["Cl"] * force_reference * 0.0125 * value['chord_length']
             drag = value["Cd"] * force_reference * 0.0125 * value['chord_length']
-            value["torque"] = value["r_position"] * (lift * math.sin(math.radians(value["arctan"])) - drag * math.cos(math.radians(value["arctan"])))
+            value["torque"] = value["r_position"] * lift * math.sin(math.radians(value["pitch_angle"])) 
+            # value["torque"] = value["r_position"] * (lift * math.sin(math.radians(value["pitch_angle"])) - drag * math.cos(math.radians(value["pitch_angle"])))
         if key < 13:
             torque_sum_small += value["torque"]
         else:
