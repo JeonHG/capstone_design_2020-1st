@@ -8,8 +8,8 @@ import pandas as pd
 # load .dat files
 array6409 = np.loadtxt("NACA6409.dat", skiprows=1)
 array2412 = np.loadtxt("NACA2412.dat", skiprows=1)
-naca6409 = Airfoil(x=array6409[:, 0], y=array6409[:, 1])
-naca2412 = Airfoil(x=array2412[:, 0], y=array2412[:, 1])
+naca6409 = Airfoil(x=1.155*array6409[:, 0], y=2.541*array6409[:, 1])
+naca2412 = Airfoil(x=1.155*array2412[:, 0], y=2.541*array2412[:, 1])
 
 # xf = XFoil()
 # xf.airfoil = naca6409
@@ -48,6 +48,9 @@ def get_torque(angular_velocity):
             xf.airfoil = naca2412
         xf.Re = re_n
         xf.max_iter = 100
+        xf.n_crit = 9.00
+        xf.xtr = [1.00, 1.00]
+        xf.M = 0
         value["Cl"], value["Cd"], value["Cm"], value["Cp"] = xf.a(aoa)
         force_reference = 0.5 * density * value["relative_velocity"]**2
         if math.isnan(value["Cl"]):
@@ -55,8 +58,7 @@ def get_torque(angular_velocity):
         else:
             lift = value["Cl"] * force_reference * 0.0125 * value['chord_length']
             drag = value["Cd"] * force_reference * 0.0125 * value['chord_length']
-            value["torque"] = value["r_position"] * lift * math.sin(math.radians(value["pitch_angle"])) 
-            # value["torque"] = value["r_position"] * (lift * math.sin(math.radians(value["pitch_angle"])) - drag * math.cos(math.radians(value["pitch_angle"])))
+            value["torque"] = value["r_position"] * (lift * math.sin(math.radians(value["pitch_angle"])) - drag * math.cos(math.radians(value["pitch_angle"])))
         if key < 13:
             torque_sum_small += value["torque"]
         else:
@@ -81,10 +83,10 @@ print(torque_df)
 from openpyxl import Workbook, load_workbook
 
 try:
-    book = load_workbook("performance.xlsx")
-    existing = pd.read_excel("performance.xlsx", sheet_name="torque-w")
+    book = load_workbook("modified-performance.xlsx")
+    existing = pd.read_excel("modified-performance.xlsx", sheet_name="torque-w")
     
-    writer = pd.ExcelWriter('performance.xlsx', engine="openpyxl", mode='a')
+    writer = pd.ExcelWriter('modified-performance.xlsx', engine="openpyxl", mode='a')
     writer.book = book
     df = pd.DataFrame.from_dict(torque_dict, orient='index', columns=['torque(N*m)'])
     writer.sheets = {ws.title: ws for ws in book.worksheets}
@@ -94,10 +96,10 @@ try:
     writer.close()
 except FileNotFoundError:
     wb = Workbook()
-    wb.save("./performance.xlsx")
+    wb.save("./modified-performance.xlsx")
     wb.close()
-    book = load_workbook("performance.xlsx")
-    writer = pd.ExcelWriter('performance.xlsx', engine='openpyxl', mode='w')
+    book = load_workbook("modified-performance.xlsx")
+    writer = pd.ExcelWriter('modified-performance.xlsx', engine='openpyxl', mode='w')
     writer.book = book
     df = pd.DataFrame.from_dict(torque_dict, orient='index', columns=['torque(N*m)'])
     df.to_excel(writer, sheet_name='torque-w', startrow=0, startcol=0, index=True, header=True, index_label="rad/s")
