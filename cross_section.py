@@ -19,11 +19,25 @@ def split_airfoil(np_arr):
 
 def get_area(arr):
     enum = list(enumerate(arr))
+    # print(enum)
+    # [(0, array([1.0e+00, 9.4e-04])), (1, array([0.9928 , 0.00313])), (2, array([0.97989, 0.00699])), ... ]
     small_sum = 0
     large_sum = 0
     for index, value in enum[:-1]:
         small_sum += (value[0] - enum[index+1][1][0])*value[1]
         # multiply x-cord difference and y-cord of current item
+
+        # print(value)
+        # [1.0e+00 9.4e-04]
+        # print(value[0])
+        # 1.0
+        # print(enum[index+1])
+        # (1, array([0.9928 , 0.00313]))
+        # print(enum[index+1][1])
+        # [0.9928  0.00313]
+        # print(enum[index+1][1][0])
+        # 0.9928
+        
         large_sum += (value[0] - enum[index+1][1][0])*enum[index+1][1][1] 
         # multiply x-cord difference and y-cord of next item
 
