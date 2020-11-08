@@ -127,3 +127,7 @@ dmypy.json
 
 desktop.ini
 .vscode
+*.xlsx
+*.ipynb
+*.csv
+*.dat

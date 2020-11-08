@@ -54,7 +54,7 @@ def random_iteration(r, w):
     Find cl, aoa, chord length, Re at particular r-position by iteration
     """
     density = 1.225
-    blade_number = 8
+    blade_number = 6
     wind_v = round(-168.75*r**2-36.75*r+20.05 , 2)
     blade_v = r*w
     rel_v = round(math.sqrt(blade_v**2 + wind_v**2),2)
@@ -93,8 +93,8 @@ def random_iteration(r, w):
     }
 
 
-# angular_speeds = np.arange(0,200,10)
-angular_speeds = [160]
+angular_speeds = np.arange(0,170,10)
+# angular_speeds = [160]
 r_positions = np.arange(0.025, 0.2, 0.0125)
 # r_positions = [0.025]
 performance_dict = {}
@@ -104,6 +104,6 @@ for w in angular_speeds:
     for position in r_positions:
         position_dict[position] = random_iteration(round(position, 4), w)
         torque_sum += random_iteration(round(position, 4), w)["torque"]
-    dict_to_xlsx(position_dict, 'iteration', w)
+    dict_to_xlsx(position_dict, '6-iteration', w)
     performance_dict[w] = {"torque":torque_sum, "power":w * torque_sum}
-dict_to_xlsx(performance_dict, "iteration", "performance")
+dict_to_xlsx(performance_dict, "6-iteration", "performance")
